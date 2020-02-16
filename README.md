@@ -19,3 +19,6 @@ Motion Manager implements the [ObservableObject](https://developer.apple.com/doc
 - @Published var isGyroOn: Bool
 - @Published var isMagnetometerOn: Bool
 - @Published var isDeviceMotionOn: Bool
+
+<br/>
+<img alt="screenshot" src="https://raw.githubusercontent.com/mobilelabclass/mobile-lab-motion-kit/master/screen_recording.gif">
