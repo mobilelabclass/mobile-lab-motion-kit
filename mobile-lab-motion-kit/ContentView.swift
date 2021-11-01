@@ -14,6 +14,17 @@ struct ContentView: View {
     var body: some View {
         NavigationView {
             Form {
+                // MARK: - Compass heading section
+                Section {
+                    Toggle(isOn: $manager.isLocationOn) {
+                        Text("Heading").bold()
+                    }
+                    
+                    SensorValueView(text: "True heading (geographic north)", value: manager.heading?.trueHeading)
+                    SensorValueView(text: "Magnetic heading", value: manager.heading?.magneticHeading)
+//                    SensorValueView(text: "Heading accuracy", value: manager.heading?.headingAccuracy)
+                }
+                
                 // MARK: - Accelerometer section
                 Section {
                     Toggle(isOn: $manager.isAccelerometerOn) {

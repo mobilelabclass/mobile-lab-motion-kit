@@ -15,7 +15,7 @@ struct SensorValueView: View {
     var body: some View {
         HStack {
             Text(text ?? "")
-                .frame(width: 40.0, alignment: .leading)
+                .frame(width: 120.0, alignment: .leading)
                 .foregroundColor(Color.secondary)
             Text("\(value ?? 0.0)")
                 .foregroundColor(Color.secondary)

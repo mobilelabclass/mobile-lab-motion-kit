@@ -9,27 +9,32 @@
 import Foundation
 import Combine
 import CoreMotion
+import CoreLocation
 
-class MotionManager: ObservableObject {
+class MotionManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     // https://developer.apple.com/documentation/coremotion/cmmotionmanager
     // CMMotionManager is responsible for starting and managing motion services.
     private let cmMotionManager = CMMotionManager()
+    private let locationManager = CLLocationManager()
     
     // Motion Values
     @Published var acceleration: CMAcceleration?
     @Published var gyroData: CMGyroData?
     @Published var magnetometerData: CMMagnetometerData?
     @Published var deviceMotion: CMDeviceMotion?
+    @Published var heading: CLHeading?
     
     // Motion on / off
     @Published var isAccelerometerOn: Bool = false
+    @Published var isLocationOn: Bool = false
     @Published var isGyroOn: Bool = false
     @Published var isMagnetometerOn: Bool = false
     @Published var isDeviceMotionOn: Bool = false
     
     private var subscriptions: Set<AnyCancellable> = []
     
-    init() {
+    override init() {
+        super.init()
         // Subscriptions
         $isAccelerometerOn.sink { [weak self] in
             $0 ? self?.startAccelerometer() : self?.stopAccelerometer()
@@ -46,6 +51,12 @@ class MotionManager: ObservableObject {
         $isDeviceMotionOn.sink { [weak self] in
             $0 ? self?.startDeviceMotion() : self?.stopDeviceMotion()
         }.store(in: &subscriptions)
+        
+        $isLocationOn.sink { [weak self] in
+            $0 ? self?.startLocation() : self?.stopLocation()
+        }.store(in: &subscriptions)
+        
+        locationManager.delegate = self
         
     }
     
@@ -86,17 +97,33 @@ class MotionManager: ObservableObject {
         cmMotionManager.stopMagnetometerUpdates()
     }
     
+    // MARK: - Location (heading) methods
+    func startLocation() {
+        locationManager.startUpdatingLocation()
+        locationManager.startUpdatingHeading()
+
+    }
+    
+    func stopLocation() {
+        locationManager.stopUpdatingLocation()
+        locationManager.stopUpdatingHeading()
+    }
+    
     // MARK: - Device motion methods
     func startDeviceMotion() {
         cmMotionManager.startDeviceMotionUpdates(to: .main) { [weak self] motion, error in
             guard let motion = motion else { return }
             self?.deviceMotion = motion
-            
         }
     }
     
     func stopDeviceMotion() {
         cmMotionManager.stopDeviceMotionUpdates()
+    }
+    
+    // MARK - delegate methods
+    func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
+        self.heading = newHeading
     }
 }
 
